@@ -9,6 +9,10 @@ const explosionContainer = document.getElementById('explosionContainer');
 let highScores = [];
 const MAX_HIGHSCORES = 5;
 
+// Variables para contador de usuarios únicos
+let currentUserId = null;
+let uniqueUsersCount = 0;
+
 // Variables para audio
 let audioContext;
 let masterVolume = 0.15; // Volumen más bajo y sutil
@@ -1025,6 +1029,83 @@ function toggleSound() {
     }
 }
 
+// ===== FUNCIONES DE USUARIOS ÚNICOS =====
+
+// Generar ID único para el usuario
+function generateUserId() {
+    return 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
+
+// Inicializar usuario único
+function initUniqueUser() {
+    // Verificar si el usuario ya tiene un ID
+    currentUserId = localStorage.getItem('tetrisUserId');
+    
+    if (!currentUserId) {
+        // Es un usuario nuevo
+        currentUserId = generateUserId();
+        localStorage.setItem('tetrisUserId', currentUserId);
+        
+        // Incrementar contador de usuarios únicos
+        uniqueUsersCount = parseInt(localStorage.getItem('tetrisUniqueUsers')) || 0;
+        uniqueUsersCount++;
+        localStorage.setItem('tetrisUniqueUsers', uniqueUsersCount.toString());
+        
+        // Mostrar animación de nuevo usuario
+        showNewUserWelcome();
+    } else {
+        // Usuario existente
+        uniqueUsersCount = parseInt(localStorage.getItem('tetrisUniqueUsers')) || 1;
+    }
+    
+    updateUniqueUsersDisplay();
+}
+
+// Mostrar bienvenida a nuevo usuario
+function showNewUserWelcome() {
+    const counter = document.getElementById('uniqueUsers');
+    counter.style.animation = 'none';
+    setTimeout(() => {
+        counter.style.animation = 'newUserCelebration 1s ease-in-out';
+    }, 10);
+    
+    // Resetear animación después
+    setTimeout(() => {
+        counter.style.animation = 'numberGlow 2s ease-in-out infinite alternate';
+    }, 1000);
+}
+
+// Actualizar display del contador
+function updateUniqueUsersDisplay() {
+    const uniqueUsersElement = document.getElementById('uniqueUsers');
+    if (uniqueUsersElement) {
+        // Animación de contador subiendo
+        let currentDisplayed = parseInt(uniqueUsersElement.textContent) || 0;
+        if (currentDisplayed < uniqueUsersCount) {
+            const increment = () => {
+                if (currentDisplayed < uniqueUsersCount) {
+                    currentDisplayed++;
+                    uniqueUsersElement.textContent = currentDisplayed;
+                    setTimeout(increment, 50);
+                }
+            };
+            increment();
+        } else {
+            uniqueUsersElement.textContent = uniqueUsersCount;
+        }
+    }
+}
+
+// Obtener estadísticas de usuario
+function getUserStats() {
+    return {
+        userId: currentUserId,
+        isNewUser: localStorage.getItem('tetrisUserId') === currentUserId,
+        totalUniqueUsers: uniqueUsersCount,
+        userNumber: uniqueUsersCount
+    };
+}
+
 // ===== FUNCIONES DE RÉCORDS =====
 
 // Cargar récords del localStorage
@@ -1154,4 +1235,5 @@ window.addEventListener('load', () => {
     drawBoard();
     drawNextPiece();
     loadHighScores();
+    initUniqueUser(); // Inicializar contador de usuarios únicos
 }); 
