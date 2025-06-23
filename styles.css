@@ -565,7 +565,7 @@ body {
 }
 
 .highscores-container {
-    max-width: 250px;
+    max-width: 320px;
 }
 
 .highscores-container h3 {
@@ -575,76 +575,149 @@ body {
 }
 
 .highscores-list {
-    max-height: 300px;
+    max-height: 320px;
     overflow-y: auto;
     margin-bottom: 15px;
+    padding: 5px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.highscores-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.highscores-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.highscores-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 217, 61, 0.5);
+    border-radius: 3px;
+}
+
+.highscores-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 217, 61, 0.7);
 }
 
 .highscore-item {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 12px;
     align-items: center;
-    padding: 8px 12px;
-    margin: 5px 0;
+    padding: 12px 15px;
+    margin: 8px 0;
     background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    border-left: 3px solid;
+    border-radius: 10px;
+    border-left: 4px solid;
+    transition: all 0.3s ease;
+    min-height: 40px;
+}
+
+.highscore-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(2px);
 }
 
 .highscore-item:nth-child(1) {
     border-left-color: #ffd93d;
-    background: rgba(255, 217, 61, 0.1);
+    background: rgba(255, 217, 61, 0.15);
+    box-shadow: 0 2px 8px rgba(255, 217, 61, 0.3);
+    position: relative;
+}
+
+.highscore-item:nth-child(1)::before {
+    content: '👑';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2em;
+    opacity: 0.7;
 }
 
 .highscore-item:nth-child(2) {
     border-left-color: #c0c0c0;
-    background: rgba(192, 192, 192, 0.1);
+    background: rgba(192, 192, 192, 0.15);
+    box-shadow: 0 2px 8px rgba(192, 192, 192, 0.3);
+    position: relative;
+}
+
+.highscore-item:nth-child(2)::before {
+    content: '🥈';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.1em;
+    opacity: 0.7;
 }
 
 .highscore-item:nth-child(3) {
     border-left-color: #cd7f32;
-    background: rgba(205, 127, 50, 0.1);
+    background: rgba(205, 127, 50, 0.15);
+    box-shadow: 0 2px 8px rgba(205, 127, 50, 0.3);
+    position: relative;
+}
+
+.highscore-item:nth-child(3)::before {
+    content: '🥉';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.1em;
+    opacity: 0.7;
 }
 
 .highscore-rank {
-    font-weight: bold;
-    margin-right: 8px;
+    font-weight: normal;
+    font-size: 1.1em;
     color: #4ecdc4;
+    text-shadow: 0 0 10px rgba(78, 205, 196, 0.5);
+    min-width: 30px;
+    text-align: center;
 }
 
 .highscore-name {
-    flex: 1;
-    text-align: left;
-    font-weight: bold;
+    font-weight: normal;
     color: white;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 1em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .highscore-score {
     color: #ffd93d;
-    font-weight: bold;
+    font-weight: normal;
+    font-size: 1.1em;
+    text-shadow: 0 0 10px rgba(255, 217, 61, 0.5);
+    text-align: right;
+    min-width: 100px;
+    margin-right: 30px;
+}
+
+.highscore-item:nth-child(n+4) .highscore-score {
+    margin-right: 0;
 }
 
 .no-records {
     color: rgba(255, 255, 255, 0.6);
     font-style: italic;
-    padding: 20px;
+    padding: 30px 20px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    border: 2px dashed rgba(255, 255, 255, 0.1);
+    margin: 10px 0;
+    font-size: 0.95em;
 }
 
-.clear-records-btn {
-    background: linear-gradient(45deg, #ff6b6b, #ff8a80);
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.9em;
-    transition: all 0.3s ease;
-}
 
-.clear-records-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 3px 10px rgba(255, 107, 107, 0.3);
-}
 
 /* Modal para registrar récord */
 .record-modal {
@@ -805,7 +878,7 @@ body {
     }
     
     .highscores-container {
-        max-width: 200px;
+        max-width: 280px;
     }
     
     .record-modal-content {

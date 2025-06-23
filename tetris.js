@@ -1037,7 +1037,7 @@ function generateUserId() {
 }
 
 // Inicializar usuario único
-function initUniqueUser() {
+async function initUniqueUser() {
     // Verificar si el usuario ya tiene un ID
     currentUserId = localStorage.getItem('tetrisUserId');
     
@@ -1047,15 +1047,13 @@ function initUniqueUser() {
         localStorage.setItem('tetrisUserId', currentUserId);
         
         // Incrementar contador de usuarios únicos
-        uniqueUsersCount = parseInt(localStorage.getItem('tetrisUniqueUsers')) || 0;
         uniqueUsersCount++;
-        localStorage.setItem('tetrisUniqueUsers', uniqueUsersCount.toString());
+        
+        // Guardar automáticamente el nuevo contador
+        await saveHighScores();
         
         // Mostrar animación de nuevo usuario
         showNewUserWelcome();
-    } else {
-        // Usuario existente
-        uniqueUsersCount = parseInt(localStorage.getItem('tetrisUniqueUsers')) || 1;
     }
     
     updateUniqueUsersDisplay();
@@ -1108,19 +1106,162 @@ function getUserStats() {
 
 // ===== FUNCIONES DE RÉCORDS =====
 
-// Cargar récords del localStorage
-function loadHighScores() {
-    const saved = localStorage.getItem('tetrisHighScores');
-    if (saved) {
-        highScores = JSON.parse(saved);
+// Clave de encriptación simple (en un proyecto real usarías algo más seguro)
+const ENCRYPTION_KEY = 'TetrisClassic2024!@#$';
+
+// Función simple de encriptación/desencriptación XOR
+function encryptDecrypt(text, key) {
+    let result = '';
+    for (let i = 0; i < text.length; i++) {
+        result += String.fromCharCode(text.charCodeAt(i) ^ key.charCodeAt(i % key.length));
     }
-    displayHighScores();
+    return result;
 }
 
-// Guardar récords en localStorage
-function saveHighScores() {
-    localStorage.setItem('tetrisHighScores', JSON.stringify(highScores));
+// Convertir a Base64 para hacer el texto más "ilegible"
+function encodeBase64(str) {
+    return btoa(encodeURIComponent(str));
 }
+
+function decodeBase64(str) {
+    try {
+        return decodeURIComponent(atob(str));
+    } catch (e) {
+        return null;
+    }
+}
+
+// Cargar récords y datos del juego automáticamente
+async function loadHighScores() {
+    highScores = [];
+    
+    try {
+        // Primero intentar cargar desde localStorage encriptado
+        const encryptedSaved = localStorage.getItem('tetrisHighScoresEncrypted');
+        if (encryptedSaved) {
+            const base64Data = decodeBase64(encryptedSaved);
+            if (base64Data) {
+                const decryptedData = encryptDecrypt(base64Data, ENCRYPTION_KEY);
+                const parsed = JSON.parse(decryptedData);
+                
+                // Verificar si es el nuevo formato con objeto completo
+                if (parsed.highScores && Array.isArray(parsed.highScores)) {
+                    highScores = parsed.highScores;
+                    uniqueUsersCount = parsed.uniqueUsersCount || 0;
+                    console.log('Datos completos cargados desde localStorage encriptado');
+                    displayHighScores();
+                    updateUniqueUsersDisplay();
+                    return;
+                } else if (Array.isArray(parsed)) {
+                    // Formato antiguo (solo récords)
+                    highScores = parsed;
+                    console.log('Récords cargados desde localStorage encriptado (formato antiguo)');
+                    displayHighScores();
+                    return;
+                }
+            }
+        }
+        
+        // Fallback: intentar cargar desde archivo records.dat
+        const response = await fetch('records.dat');
+        if (response.ok) {
+            const encryptedData = await response.text();
+            if (encryptedData.trim()) {
+                const base64Data = decodeBase64(encryptedData);
+                if (base64Data) {
+                    const decryptedData = encryptDecrypt(base64Data, ENCRYPTION_KEY);
+                    const parsed = JSON.parse(decryptedData);
+                    
+                    // Verificar si es el nuevo formato con objeto completo
+                    if (parsed.highScores && Array.isArray(parsed.highScores)) {
+                        highScores = parsed.highScores;
+                        uniqueUsersCount = parsed.uniqueUsersCount || 0;
+                        console.log('Datos completos cargados desde archivo');
+                        displayHighScores();
+                        updateUniqueUsersDisplay();
+                        return;
+                    } else if (Array.isArray(parsed)) {
+                        // Formato antiguo (solo récords)
+                        highScores = parsed;
+                        console.log('Récords cargados desde archivo (formato antiguo)');
+                        displayHighScores();
+                        return;
+                    }
+                }
+            }
+        }
+        
+        // Último fallback: localStorage normal
+        const saved = localStorage.getItem('tetrisHighScores');
+        if (saved) {
+            highScores = JSON.parse(saved);
+            console.log('Récords cargados desde localStorage normal');
+        }
+        
+        // Cargar contador de usuarios desde localStorage normal si no se cargó antes
+        const savedUsers = localStorage.getItem('tetrisUniqueUsers');
+        if (savedUsers && uniqueUsersCount === 0) {
+            uniqueUsersCount = parseInt(savedUsers) || 0;
+        }
+        
+    } catch (error) {
+        console.log('Error al cargar datos del juego, usando valores por defecto');
+        highScores = [];
+        uniqueUsersCount = 0;
+    }
+    
+    displayHighScores();
+    updateUniqueUsersDisplay();
+}
+
+// Guardar récords y datos del juego automáticamente
+async function saveHighScores() {
+    try {
+        // Crear objeto completo con récords y estadísticas
+        const gameData = {
+            highScores: highScores,
+            uniqueUsersCount: uniqueUsersCount,
+            lastUpdated: new Date().toISOString()
+        };
+        
+        const jsonData = JSON.stringify(gameData);
+        const encryptedData = encryptDecrypt(jsonData, ENCRYPTION_KEY);
+        const base64Data = encodeBase64(encryptedData);
+        
+        // Guardar en localStorage encriptado como respaldo principal
+        localStorage.setItem('tetrisHighScoresEncrypted', base64Data);
+        
+        // También guardar en localStorage normal para compatibilidad
+        localStorage.setItem('tetrisHighScores', JSON.stringify(highScores));
+        localStorage.setItem('tetrisUniqueUsers', uniqueUsersCount.toString());
+        
+        // Intentar actualizar el archivo records.dat automáticamente
+        await updateRecordsFile(base64Data);
+        
+    } catch (error) {
+        console.error('Error al guardar datos del juego:', error);
+        // Fallback básico
+        localStorage.setItem('tetrisHighScores', JSON.stringify(highScores));
+        localStorage.setItem('tetrisUniqueUsers', uniqueUsersCount.toString());
+    }
+}
+
+// Actualizar archivo de récords silenciosamente
+async function updateRecordsFile(data) {
+    try {
+        // Crear un blob con los datos
+        const blob = new Blob([data], { type: 'application/octet-stream' });
+        
+        // En un entorno real, esto requeriría permisos especiales del navegador
+        // Por ahora solo mantenemos los datos en localStorage
+        console.log('Récords guardados automáticamente');
+        
+    } catch (error) {
+        console.log('Guardado automático en localStorage solamente');
+    }
+}
+
+
 
 // Verificar si es un nuevo récord
 function isNewHighScore(score) {
@@ -1137,23 +1278,36 @@ function showNewRecordNotice() {
 function showRecordModal() {
     document.getElementById('recordScore').textContent = gameState.score;
     document.getElementById('recordModal').style.display = 'flex';
-    document.getElementById('playerName').focus();
+    
+    // Limpiar el input y darle foco
+    const playerNameInput = document.getElementById('playerName');
+    playerNameInput.value = '';
+    playerNameInput.focus();
 }
 
 // Ocultar modal de récord
 function hideRecordModal() {
     document.getElementById('recordModal').style.display = 'none';
     document.getElementById('gameOverScreen').style.display = 'flex';
+    
+    // Limpiar el input del nombre
+    document.getElementById('playerName').value = '';
 }
 
 // Agregar nuevo récord
-function addHighScore(name, score, lines) {
+async function addHighScore(name, score, lines) {
+    console.log('addHighScore recibió - name:', name, 'score:', score, 'lines:', lines);
+    const trimmedName = name.trim() || 'Anónimo';
+    console.log('Nombre después de trim:', trimmedName);
+    
     const newRecord = {
-        name: name.trim() || 'Anónimo',
+        name: trimmedName,
         score: score,
         lines: lines,
         date: new Date().toLocaleDateString('es-ES')
     };
+    
+    console.log('Nuevo récord creado:', newRecord);
     
     highScores.push(newRecord);
     highScores.sort((a, b) => b.score - a.score);
@@ -1162,7 +1316,7 @@ function addHighScore(name, score, lines) {
         highScores = highScores.slice(0, MAX_HIGHSCORES);
     }
     
-    saveHighScores();
+    await saveHighScores();
     displayHighScores();
 }
 
@@ -1190,23 +1344,24 @@ function displayHighScores() {
     container.innerHTML = html;
 }
 
-// Limpiar récords
-function clearHighScores() {
-    if (confirm('¿Estás seguro de que quieres borrar todos los récords?')) {
-        highScores = [];
-        saveHighScores();
-        displayHighScores();
-    }
-}
+
 
 // ===== EVENT LISTENERS PARA RÉCORDS =====
 
 // Controles del modal de récord
-document.getElementById('saveRecordBtn').addEventListener('click', () => {
+document.getElementById('saveRecordBtn').addEventListener('click', async () => {
     playButtonSound();
-    const playerName = document.getElementById('playerName').value;
-    addHighScore(playerName, gameState.score, gameState.lines);
+    
+    // Capturar el valor antes de cualquier otra operación
+    const playerNameInput = document.getElementById('playerName');
+    const playerName = playerNameInput.value;
+    console.log('Nombre capturado:', playerName, 'Longitud:', playerName.length);
+    
+    // Cerrar el modal primero
     hideRecordModal();
+    
+    // Luego guardar el récord
+    await addHighScore(playerName, gameState.score, gameState.lines);
 });
 
 document.getElementById('skipRecordBtn').addEventListener('click', () => {
@@ -1221,8 +1376,7 @@ document.getElementById('playerName').addEventListener('keypress', (e) => {
     }
 });
 
-// Botón limpiar récords
-document.getElementById('clearRecordsBtn').addEventListener('click', clearHighScores);
+
 
 // Botón de sonido
 document.getElementById('soundBtn').addEventListener('click', () => {
@@ -1230,10 +1384,10 @@ document.getElementById('soundBtn').addEventListener('click', () => {
 });
 
 // Inicializar cuando se carga la página
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
     initGame();
     drawBoard();
     drawNextPiece();
-    loadHighScores();
-    initUniqueUser(); // Inicializar contador de usuarios únicos
+    await loadHighScores();
+    await initUniqueUser(); // Inicializar contador de usuarios únicos
 }); 
