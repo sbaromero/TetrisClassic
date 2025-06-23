@@ -195,9 +195,24 @@ body {
     text-transform: uppercase;
 }
 
-#startBtn, #playAgainBtn {
+#startBtn {
     background: linear-gradient(45deg, #6bcf7f, #4ecdc4);
     color: white;
+}
+
+#playAgainBtn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 1.3em;
+    padding: 15px 35px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 1px;
 }
 
 #pauseBtn {
@@ -224,6 +239,47 @@ body {
 
 .game-controls button:active {
     transform: translateY(1px);
+}
+
+/* Efectos especiales para el botón "Jugar de Nuevo" */
+#playAgainBtn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+#playAgainBtn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 12px 35px rgba(102, 126, 234, 0.6);
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+#playAgainBtn:hover::before {
+    left: 100%;
+}
+
+#playAgainBtn:active {
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+/* Animación de pulso para el botón */
+@keyframes playAgainPulse {
+    0%, 100% {
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+    50% {
+        box-shadow: 0 8px 35px rgba(102, 126, 234, 0.7);
+    }
+}
+
+#playAgainBtn {
+    animation: playAgainPulse 2s ease-in-out infinite;
 }
 
 .game-over-screen {
