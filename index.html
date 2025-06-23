@@ -1,25 +1,101 @@
-🧨 TETRIS EXPLOSIVO 🧨
-Puntuación: 0
-Líneas: 0
-Nivel: 1
-Siguiente:
-
-Controles:
-← → : Mover
-↓ : Bajar rápido
-↑ : Rotar
-Espacio: Soltar
-P: Pausa
-🏆 Récords
-¡Sé el primero en anotar!
-Limpiar Récords
-Iniciar Juego Pausa Reiniciar 🔊
-¡JUEGO TERMINADO!
-Puntuación Final: 0
-Líneas Completadas: 0
-Jugar de Nuevo
-🏆 ¡NUEVO RÉCORD!
-¡Felicidades! Has conseguido un puntaje increíble
-Puntuación: 0
-Ingresa tu nombre:
-Guardar Récord Saltar
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetris Explosivo</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1>🧨 TETRIS EXPLOSIVO 🧨</h1>
+            <div class="score-panel">
+                <div class="score-item">
+                    <span>Puntuación: </span>
+                    <span id="score">0</span>
+                </div>
+                <div class="score-item">
+                    <span>Líneas: </span>
+                    <span id="lines">0</span>
+                </div>
+                <div class="score-item">
+                    <span>Nivel: </span>
+                    <span id="level">1</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="game-board-container">
+            <div class="next-piece-container">
+                <h3>Siguiente:</h3>
+                <canvas id="nextCanvas" width="120" height="120"></canvas>
+            </div>
+            
+            <div class="main-game-area">
+                <canvas id="gameCanvas" width="300" height="600"></canvas>
+                <div class="explosion-container" id="explosionContainer"></div>
+            </div>
+            
+            <div class="side-panel">
+                <div class="controls">
+                    <h3>Controles:</h3>
+                    <div class="control-info">
+                        <p>← → : Mover</p>
+                        <p>↓ : Bajar rápido</p>
+                        <p>↑ : Rotar</p>
+                        <p>Espacio: Soltar</p>
+                        <p>P: Pausa</p>
+                    </div>
+                </div>
+                
+                <div class="highscores-container">
+                    <h3>🏆 Récords</h3>
+                    <div class="highscores-list" id="highscoresList">
+                        <div class="no-records">¡Sé el primero en anotar!</div>
+                    </div>
+                    <button id="clearRecordsBtn" class="clear-records-btn">Limpiar Récords</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="game-controls">
+            <button id="startBtn">Iniciar Juego</button>
+            <button id="pauseBtn">Pausa</button>
+            <button id="restartBtn">Reiniciar</button>
+            <button id="soundBtn" title="Toggle Sonido">🔊</button>
+        </div>
+        
+        <div class="game-over-screen" id="gameOverScreen">
+            <div class="game-over-content">
+                <h2>¡JUEGO TERMINADO!</h2>
+                <p>Puntuación Final: <span id="finalScore">0</span></p>
+                <p>Líneas Completadas: <span id="finalLines">0</span></p>
+                <div class="new-record-notice" id="newRecordNotice" style="display: none;">
+                    <p class="record-text">🎉 ¡NUEVO RÉCORD! 🎉</p>
+                </div>
+                <button id="playAgainBtn">Jugar de Nuevo</button>
+            </div>
+        </div>
+        
+        <!-- Modal para registro de récord -->
+        <div class="record-modal" id="recordModal">
+            <div class="record-modal-content">
+                <h2>🏆 ¡NUEVO RÉCORD!</h2>
+                <p>¡Felicidades! Has conseguido un puntaje increíble</p>
+                <p class="record-score">Puntuación: <span id="recordScore">0</span></p>
+                <div class="name-input-container">
+                    <label for="playerName">Ingresa tu nombre:</label>
+                    <input type="text" id="playerName" maxlength="15" placeholder="Tu nombre aquí...">
+                </div>
+                <div class="record-modal-buttons">
+                    <button id="saveRecordBtn">Guardar Récord</button>
+                    <button id="skipRecordBtn">Saltar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="tetris.js"></script>
+</body>
+</html> 
