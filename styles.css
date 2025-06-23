@@ -962,6 +962,11 @@ body {
         user-select: none;
         -webkit-user-select: none;
         -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
+        /* Prevenir comportamientos erráticos */
+        pointer-events: auto;
+        position: relative;
+        z-index: 10;
     }
     
     .side-panel {

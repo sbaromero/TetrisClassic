@@ -1413,9 +1413,10 @@ let touchStartY = 0;
 let touchStartTime = 0;
 let touchMoved = false;
 
-const SWIPE_THRESHOLD = 30; // Distancia mínima para considerar un swipe (reducido para mayor sensibilidad)
-const TAP_THRESHOLD = 15; // Distancia máxima para considerar un tap (aumentado ligeramente)
-const LONG_TAP_DURATION = 400; // Duración para tap largo (ms) (reducido para ser más rápido)
+const SWIPE_THRESHOLD = 40; // Distancia mínima para considerar un swipe 
+const TAP_THRESHOLD = 20; // Distancia máxima para considerar un tap
+const LONG_TAP_DURATION = 500; // Duración para tap largo (ms)
+const MIN_TOUCH_TIME = 100; // Tiempo mínimo para considerar un toque válido (evitar toques accidentales)
 
 // Inicializar controles táctiles
 function initTouchControls() {
@@ -1427,8 +1428,15 @@ function initTouchControls() {
     gameCanvas.addEventListener('touchstart', handleTouchStart, { passive: false });
     gameCanvas.addEventListener('touchmove', handleTouchMove, { passive: false });
     gameCanvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+    gameCanvas.addEventListener('touchcancel', handleTouchEnd, { passive: false }); // Manejar cancelaciones
     
-    // Prevenir zoom y scroll en el área de juego
+    // Prevenir zoom y scroll en toda la página cuando se toca el canvas
+    document.addEventListener('touchstart', (e) => {
+        if (e.target === gameCanvas || e.target.closest('#gameCanvas')) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+    
     document.addEventListener('touchmove', (e) => {
         if (e.target === gameCanvas || e.target.closest('#gameCanvas')) {
             e.preventDefault();
@@ -1440,15 +1448,20 @@ function initTouchControls() {
         e.preventDefault();
     });
     
-    // Test de detección táctil
-    gameCanvas.addEventListener('touchstart', (e) => {
-        console.log('👆 Touch detectado en canvas');
-    }, { passive: true });
+    // Prevenir selección de texto
+    gameCanvas.addEventListener('selectstart', (e) => {
+        e.preventDefault();
+    });
     
     console.log('✅ Controles táctiles inicializados');
 }
 
 function handleTouchStart(e) {
+    // Solo procesar el primer toque (ignorar multi-touch)
+    if (e.touches.length > 1) {
+        return;
+    }
+    
     console.log('🔥 TouchStart - Estado del juego:', {
         gameStarted: gameState.gameStarted,
         gameOver: gameState.gameOver,
@@ -1462,6 +1475,8 @@ function handleTouchStart(e) {
     }
     
     e.preventDefault();
+    e.stopPropagation();
+    
     const touch = e.touches[0];
     touchStartX = touch.clientX;
     touchStartY = touch.clientY;
@@ -1472,21 +1487,36 @@ function handleTouchStart(e) {
 }
 
 function handleTouchMove(e) {
+    // Solo procesar si hay exactamente un toque
+    if (e.touches.length !== 1) {
+        return;
+    }
+    
     if (gameState.gameOver || gameState.paused) return;
     
     e.preventDefault();
+    e.stopPropagation();
+    
     const touch = e.touches[0];
     const deltaX = Math.abs(touch.clientX - touchStartX);
     const deltaY = Math.abs(touch.clientY - touchStartY);
     
     // Marcar como movido si supera el umbral
     if (deltaX > TAP_THRESHOLD || deltaY > TAP_THRESHOLD) {
+        if (!touchMoved) {
+            console.log('📱 Touch movido - deltaX:', deltaX, 'deltaY:', deltaY);
+        }
         touchMoved = true;
-        console.log('📱 Touch movido - deltaX:', deltaX, 'deltaY:', deltaY);
     }
 }
 
 function handleTouchEnd(e) {
+    // Verificar que tenemos datos de inicio del toque
+    if (touchStartTime === 0) {
+        console.log('⚠️ TouchEnd sin TouchStart válido');
+        return;
+    }
+    
     console.log('🎯 TouchEnd - Estado del juego:', {
         gameStarted: gameState.gameStarted,
         gameOver: gameState.gameOver,
@@ -1499,10 +1529,18 @@ function handleTouchEnd(e) {
     }
     
     e.preventDefault();
+    e.stopPropagation();
+    
     const touch = e.changedTouches[0];
     const deltaX = touch.clientX - touchStartX;
     const deltaY = touch.clientY - touchStartY;
     const deltaTime = Date.now() - touchStartTime;
+    
+    // Ignorar toques muy rápidos (posibles toques accidentales)
+    if (deltaTime < MIN_TOUCH_TIME) {
+        console.log('⚡ Toque muy rápido, ignorando');
+        return;
+    }
     
     const absDeltaX = Math.abs(deltaX);
     const absDeltaY = Math.abs(deltaY);
@@ -1515,7 +1553,7 @@ function handleTouchEnd(e) {
         gameStarted: gameState.gameStarted
     });
     
-    // Si el juego no ha iniciado, iniciar con cualquier toque
+    // Si el juego no ha iniciado, iniciar con cualquier toque válido
     if (!gameState.gameStarted) {
         console.log('🚀 Iniciando juego con touch');
         startGame();
@@ -1526,6 +1564,15 @@ function handleTouchEnd(e) {
         }
         return;
     }
+    
+    // Evitar acciones múltiples muy rápidas
+    const now = Date.now();
+    const timeSinceLastAction = now - (window.lastTouchAction || 0);
+    if (timeSinceLastAction < 150) { // 150ms de cooldown entre acciones
+        console.log('⏱️ Acción muy rápida, esperando cooldown');
+        return;
+    }
+    window.lastTouchAction = now;
     
     if (!touchMoved) {
         // Es un TAP
@@ -1543,7 +1590,7 @@ function handleTouchEnd(e) {
             console.log('🔄 Touch: Rotate piece (tap)');
         }
     } else {
-        // Es un SWIPE
+        // Es un SWIPE - solo procesar si supera claramente el umbral
         if (absDeltaX > absDeltaY && absDeltaX > SWIPE_THRESHOLD) {
             // SWIPE HORIZONTAL
             if (deltaX > 0) {
@@ -1560,17 +1607,26 @@ function handleTouchEnd(e) {
                 console.log('⬅️ Touch: Move left (swipe)');
             }
         } else if (absDeltaY > absDeltaX && absDeltaY > SWIPE_THRESHOLD) {
-            // SWIPE VERTICAL
+            // SWIPE VERTICAL hacia abajo
             if (deltaY > 0) {
-                // Swipe abajo - bajar rápido
                 movePiece(0, 1);
                 vibrateFeedback(25);
                 showTouchFeedback('↓', touch.clientX, touch.clientY);
                 console.log('⬇️ Touch: Move down (swipe)');
             }
             // Ignoramos swipe hacia arriba
+        } else {
+            // Movimiento ambiguo, tratar como tap
+            console.log('🤷 Movimiento ambiguo, tratando como tap');
+            rotateCurrentPiece();
+            vibrateFeedback(50);
+            showTouchFeedback('ROTATE', touch.clientX, touch.clientY);
         }
     }
+    
+    // Resetear variables de toque
+    touchStartTime = 0;
+    touchMoved = false;
 }
 
 // Vibración táctil (si está disponible)
@@ -1710,5 +1766,11 @@ window.addEventListener('load', async () => {
     // Debug: Detectar cualquier toque en la pantalla
     document.addEventListener('touchstart', (e) => {
         console.log('🌍 Touch global detectado en:', e.target.tagName, e.target.id || e.target.className);
+        console.log('📱 Info del dispositivo:', {
+            touches: e.touches.length,
+            userAgent: navigator.userAgent.includes('Mobile') ? 'Mobile' : 'Desktop',
+            screen: `${screen.width}x${screen.height}`,
+            orientation: screen.orientation ? screen.orientation.angle : 'unknown'
+        });
     }, { passive: true });
 }); 
