@@ -928,57 +928,67 @@ body {
 /* Responsive Design - TODO EN UNA PANTALLA */
 @media (max-width: 768px) {
     body {
-        padding: 5px;
+        padding: 2px;
         margin: 0;
         height: 100vh;
+        height: 100dvh; /* Mejor soporte para viewport dinámico */
         overflow: hidden;
         display: flex;
         flex-direction: column;
     }
     
     .game-container {
-        padding: 5px;
+        padding: 3px;
         margin: 0;
         width: 100%;
         height: 100vh;
+        height: 100dvh;
         max-width: 100%;
         box-sizing: border-box;
         display: flex;
         flex-direction: column;
         overflow: hidden;
+        border-radius: 0; /* Sin bordes redondeados en móvil para aprovechar espacio */
     }
     
     .game-header {
         flex-shrink: 0;
-        margin-bottom: 5px;
+        margin-bottom: 3px;
+        padding: 0;
     }
     
     .game-header h1 {
-        font-size: 1.4em;
-        margin: 0 0 2px 0;
-        line-height: 1.2;
+        font-size: 1.2em;
+        margin: 0;
+        line-height: 1.1;
+        padding: 2px 0;
     }
     
     .game-subtitle {
-        font-size: 0.8em;
-        margin: 0 0 5px 0;
+        font-size: 0.7em;
+        margin: 0 0 3px 0;
+        line-height: 1.1;
     }
     
     .score-panel {
         flex-direction: row;
-        flex-wrap: wrap;
-        gap: 4px;
-        justify-content: center;
-        margin: 0 0 5px 0;
-        padding: 5px;
+        flex-wrap: nowrap;
+        gap: 3px;
+        justify-content: space-between;
+        margin: 0 0 4px 0;
+        padding: 3px;
+        border-radius: 6px;
     }
     
     .score-item {
-        font-size: 0.8em;
-        padding: 4px 8px;
+        font-size: 0.7em;
+        padding: 2px 4px;
         background: rgba(255, 255, 255, 0.1);
-        border-radius: 6px;
-        min-width: 60px;
+        border-radius: 4px;
+        min-width: 50px;
+        text-align: center;
+        flex: 1;
+        line-height: 1.2;
     }
     
     .game-board-container {
@@ -986,9 +996,10 @@ body {
         display: flex;
         flex-direction: row;
         align-items: stretch;
-        gap: 8px;
+        gap: 4px;
         min-height: 0;
         overflow: hidden;
+        padding: 0;
     }
     
     .main-game-area {
@@ -996,16 +1007,18 @@ body {
         display: flex;
         justify-content: center;
         align-items: center;
+        padding: 0;
     }
     
     #gameCanvas {
-        width: calc(100vw - 140px);
-        height: calc(100vh - 120px);
-        max-width: 220px;
-        max-height: 440px;
-        min-width: 180px;
-        min-height: 360px;
-        border-width: 2px;
+        width: calc(100vw - 110px);
+        height: calc(100vh - 90px);
+        height: calc(100dvh - 90px);
+        max-width: 200px;
+        max-height: 400px;
+        min-width: 160px;
+        min-height: 320px;
+        border-width: 1px;
         /* Optimizado para touch */
         touch-action: none;
         user-select: none;
@@ -1021,156 +1034,324 @@ body {
         flex: 1;
         display: flex;
         flex-direction: column;
-        gap: 8px;
-        min-width: 130px;
+        gap: 4px;
+        min-width: 100px;
         overflow: hidden;
+        padding: 0;
     }
     
     .next-piece-container {
         flex-shrink: 0;
-        padding: 8px;
+        padding: 4px;
         margin: 0;
+        border-radius: 6px;
     }
     
     .next-piece-container h3 {
-        font-size: 0.9em;
-        margin: 0 0 5px 0;
+        font-size: 0.8em;
+        margin: 0 0 3px 0;
+        line-height: 1.1;
     }
     
     #nextCanvas {
-        width: 80px;
-        height: 80px;
+        width: 60px;
+        height: 60px;
     }
     
     .controls {
         flex-shrink: 0;
-        padding: 8px;
+        padding: 4px;
         margin: 0;
+        border-radius: 6px;
     }
     
     .controls h3 {
-        font-size: 0.9em;
-        margin: 0 0 5px 0;
+        font-size: 0.8em;
+        margin: 0 0 3px 0;
+        line-height: 1.1;
     }
     
     .control-info p {
-        font-size: 0.7em;
-        margin: 2px 0;
-        line-height: 1.2;
+        font-size: 0.6em;
+        margin: 1px 0;
+        line-height: 1.1;
     }
     
     .highscores-container {
         flex: 1;
-        padding: 8px;
+        padding: 4px;
         margin: 0;
         min-height: 0;
         overflow: hidden;
+        border-radius: 6px;
     }
     
     .highscores-container h3 {
-        font-size: 0.9em;
-        margin: 0 0 5px 0;
+        font-size: 0.8em;
+        margin: 0 0 3px 0;
+        line-height: 1.1;
     }
     
     .highscores-list {
-        max-height: calc(100% - 25px);
+        max-height: calc(100% - 20px);
         overflow-y: auto;
+        padding: 0;
     }
     
     .highscore-item {
-        padding: 6px 8px;
-        margin: 3px 0;
-        min-height: 25px;
-        font-size: 0.75em;
+        padding: 3px 4px;
+        margin: 1px 0;
+        min-height: 18px;
+        font-size: 0.65em;
+        line-height: 1.1;
+        border-radius: 3px;
     }
     
     .highscore-rank {
-        font-size: 0.8em;
-        min-width: 20px;
+        font-size: 0.7em;
+        min-width: 15px;
     }
     
     .highscore-name {
-        font-size: 0.75em;
+        font-size: 0.65em;
+        max-width: 40px;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     
     .highscore-score {
-        font-size: 0.8em;
-        min-width: 50px;
+        font-size: 0.7em;
+        min-width: 35px;
     }
     
     .users-counter {
-        margin-top: 5px;
-        padding: 5px 8px;
+        margin-top: 3px;
+        padding: 3px 5px;
+        border-radius: 4px;
     }
     
     .counter-item {
-        font-size: 0.7em;
+        font-size: 0.6em;
+        gap: 2px;
     }
     
     .counter-number {
-        font-size: 1em;
+        font-size: 0.9em;
+        margin-top: 1px;
+    }
+    
+    .counter-text {
+        font-size: 0.7em;
     }
     
     .game-controls {
         flex-shrink: 0;
-        margin: 5px 0 0 0;
+        margin: 3px 0 0 0;
         flex-wrap: wrap;
-        gap: 6px;
+        gap: 3px;
         justify-content: center;
+        padding: 0;
     }
     
     .game-controls button {
-        font-size: 0.8em;
-        padding: 8px 12px;
-        min-width: 60px;
+        font-size: 0.7em;
+        padding: 4px 8px;
+        min-width: 45px;
         touch-action: manipulation;
+        border-radius: 4px;
+        line-height: 1.2;
     }
     
     .record-modal-content {
-        padding: 15px;
+        padding: 10px;
         margin: 5px;
         max-width: 95%;
-        max-height: 90vh;
+        max-height: 85vh;
         overflow-y: auto;
+        border-radius: 8px;
     }
 }
 
 /* Estilos específicos para móviles muy pequeños */
 @media (max-width: 480px) {
     .game-header h1 {
-        font-size: 1.6em;
+        font-size: 1.1em;
+        padding: 1px 0;
     }
     
     .game-subtitle {
-        font-size: 0.9em;
+        font-size: 0.65em;
+        margin: 0 0 2px 0;
     }
     
     #gameCanvas {
-        width: 250px;
-        height: 500px;
+        width: calc(100vw - 85px);
+        height: calc(100vh - 75px);
+        height: calc(100dvh - 75px);
+        max-width: 180px;
+        max-height: 360px;
+        min-width: 140px;
+        min-height: 280px;
     }
     
     .side-panel {
-        flex-direction: column;
-        align-items: center;
+        min-width: 80px;
+        gap: 2px;
     }
     
     .next-piece-container,
     .controls,
     .highscores-container {
-        max-width: 100%;
-        width: 100%;
-        margin-bottom: 15px;
+        padding: 3px;
+    }
+    
+    .next-piece-container h3,
+    .controls h3,
+    .highscores-container h3 {
+        font-size: 0.7em;
+        margin: 0 0 2px 0;
+    }
+    
+    #nextCanvas {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .control-info p {
+        font-size: 0.55em;
+        margin: 0.5px 0;
+    }
+    
+    .score-panel {
+        gap: 2px;
+        padding: 2px;
+        margin: 0 0 3px 0;
+    }
+    
+    .score-item {
+        font-size: 0.65em;
+        padding: 1px 3px;
+        min-width: 40px;
+    }
+    
+    .highscore-item {
+        padding: 2px 3px;
+        min-height: 16px;
+        font-size: 0.6em;
+    }
+    
+    .highscore-rank {
+        font-size: 0.65em;
+        min-width: 12px;
+    }
+    
+    .highscore-name {
+        font-size: 0.6em;
+        max-width: 35px;
+    }
+    
+    .highscore-score {
+        font-size: 0.65em;
+        min-width: 30px;
+    }
+    
+    .game-controls button {
+        font-size: 0.65em;
+        padding: 3px 6px;
+        min-width: 40px;
+    }
+    
+    .users-counter {
+        padding: 2px 4px;
+        margin-top: 2px;
+    }
+    
+    .counter-item {
+        font-size: 0.55em;
+    }
+    
+    .counter-number {
+        font-size: 0.8em;
+    }
+    
+    .counter-text {
+        font-size: 0.65em;
+    }
+}
+
+/* Estilos para pantallas extra pequeñas (menos de 360px) */
+@media (max-width: 360px) {
+    .game-container {
+        padding: 2px;
+    }
+    
+    .game-header h1 {
+        font-size: 1em;
+    }
+    
+    .game-subtitle {
+        font-size: 0.6em;
+        margin: 0 0 1px 0;
+    }
+    
+    #gameCanvas {
+        width: calc(100vw - 75px);
+        height: calc(100vh - 65px);
+        height: calc(100dvh - 65px);
+        max-width: 160px;
+        max-height: 320px;
+        min-width: 120px;
+        min-height: 240px;
+    }
+    
+    .side-panel {
+        min-width: 70px;
+        gap: 1px;
+    }
+    
+    #nextCanvas {
+        width: 40px;
+        height: 40px;
     }
     
     .score-panel {
         flex-direction: column;
-        gap: 5px;
+        gap: 1px;
+        padding: 2px;
     }
     
     .score-item {
-        font-size: 0.9em;
-        padding: 6px 10px;
+        font-size: 0.6em;
+        padding: 1px 2px;
+        min-width: 35px;
+    }
+    
+    .next-piece-container h3,
+    .controls h3,
+    .highscores-container h3 {
+        font-size: 0.65em;
+        margin: 0 0 1px 0;
+    }
+    
+    .control-info p {
+        font-size: 0.5em;
+    }
+    
+    .highscore-item {
+        font-size: 0.55em;
+        padding: 1px 2px;
+        min-height: 14px;
+    }
+    
+    .game-controls {
+        gap: 2px;
+        margin: 2px 0 0 0;
+    }
+    
+    .game-controls button {
+        font-size: 0.6em;
+        padding: 2px 4px;
+        min-width: 35px;
     }
 }
 
@@ -1226,47 +1407,169 @@ body {
     
     #gameCanvas {
         border-color: #4ecdc4;
-        box-shadow: 0 0 15px rgba(78, 205, 196, 0.3);
+        box-shadow: 0 0 10px rgba(78, 205, 196, 0.3);
     }
     
     .touch-hint {
         display: block;
+        font-size: 1em;
+        padding: 8px 12px;
+        border-radius: 15px;
     }
     
     .main-game-area {
         position: relative;
     }
+    
+    /* Ajustes específicos para táctil en móvil */
+    .game-controls button {
+        min-height: 35px;
+        min-width: 50px;
+        font-size: 0.75em;
+        padding: 6px 10px;
+    }
+    
+    /* Mejorar área de toque para elementos pequeños */
+    .highscore-item {
+        min-height: 20px;
+        padding: 4px 6px;
+    }
+    
+    .score-item {
+        min-height: 20px;
+        padding: 3px 5px;
+    }
 }
 
-/* Feedback visual para gestos táctiles */
-.touch-feedback {
-    position: fixed;
-    pointer-events: none;
-    z-index: 9999;
-    background: rgba(78, 205, 196, 0.9);
-    color: white;
-    padding: 8px 12px;
-    border-radius: 20px;
-    font-size: 1.2em;
-    font-weight: bold;
-    transform: translate(-50%, -50%);
-    animation: touchFeedbackAnimation 0.8s ease-out forwards;
-    box-shadow: 0 4px 12px rgba(78, 205, 196, 0.4);
-    border: 2px solid rgba(255, 255, 255, 0.3);
+/* Ajustes adicionales para mejorar el uso del espacio vertical */
+@media (max-width: 768px) and (max-height: 600px) {
+    .game-header h1 {
+        font-size: 1em;
+        margin: 0;
+        padding: 1px 0;
+    }
+    
+    .game-subtitle {
+        font-size: 0.6em;
+        margin: 0 0 2px 0;
+    }
+    
+    .score-panel {
+        margin: 0 0 2px 0;
+        padding: 2px;
+    }
+    
+    .game-board-container {
+        gap: 3px;
+    }
+    
+    #gameCanvas {
+        height: calc(100vh - 75px);
+        height: calc(100dvh - 75px);
+        max-height: 350px;
+    }
+    
+    .game-controls {
+        margin: 2px 0 0 0;
+    }
+    
+    .game-controls button {
+        font-size: 0.65em;
+        padding: 3px 6px;
+    }
 }
 
-@keyframes touchFeedbackAnimation {
-    0% {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(0.8);
+/* Para pantallas muy anchas pero bajas (landscape en móvil) */
+@media (max-width: 900px) and (max-height: 500px) {
+    body {
+        padding: 1px;
     }
-    20% {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1.2);
+    
+    .game-container {
+        padding: 2px;
+        flex-direction: row;
+        align-items: stretch;
     }
-    100% {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(0.6) translateY(-30px);
+    
+    .game-header {
+        position: absolute;
+        top: 2px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 100;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 2px 8px;
+        border-radius: 6px;
+        margin-bottom: 0;
+        width: auto;
+    }
+    
+    .game-header h1 {
+        font-size: 0.9em;
+        margin: 0;
+    }
+    
+    .game-subtitle {
+        display: none;
+    }
+    
+    .score-panel {
+        position: absolute;
+        top: 25px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 100;
+        background: rgba(0, 0, 0, 0.8);
+        border-radius: 6px;
+        margin: 0;
+        padding: 2px;
+        gap: 2px;
+        max-width: 90%;
+    }
+    
+    .score-item {
+        font-size: 0.6em;
+        padding: 1px 3px;
+        min-width: 35px;
+    }
+    
+    .game-board-container {
+        margin-top: 50px;
+        flex: 1;
+        gap: 5px;
+    }
+    
+    #gameCanvas {
+        width: calc(100vh - 100px);
+        height: calc(100vh - 100px);
+        max-width: 300px;
+        max-height: 300px;
+        min-width: 200px;
+        min-height: 200px;
+    }
+    
+    .side-panel {
+        gap: 3px;
+        min-width: 120px;
+    }
+    
+    .game-controls {
+        position: absolute;
+        bottom: 2px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 100;
+        background: rgba(0, 0, 0, 0.8);
+        border-radius: 6px;
+        padding: 2px;
+        margin: 0;
+        gap: 2px;
+    }
+    
+    .game-controls button {
+        font-size: 0.6em;
+        padding: 2px 4px;
+        min-width: 35px;
     }
 }
 
@@ -1316,4 +1619,69 @@ body {
     max-height: 70vh;
     width: auto;
     height: auto;
+}
+
+/* Feedback visual para gestos táctiles */
+.touch-feedback {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    background: rgba(78, 205, 196, 0.9);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 15px;
+    font-size: 1em;
+    font-weight: bold;
+    transform: translate(-50%, -50%);
+    animation: touchFeedbackAnimation 0.8s ease-out forwards;
+    box-shadow: 0 4px 12px rgba(78, 205, 196, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+@keyframes touchFeedbackAnimation {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    20% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.2);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.6) translateY(-30px);
+    }
+}
+
+/* Optimizaciones adicionales para viewport pequeño */
+@media (max-width: 768px) {
+    /* Prevenir zoom automático en inputs en iOS */
+    input[type="text"], input[type="email"], input[type="password"] {
+        font-size: 16px;
+    }
+    
+    /* Mejorar rendimiento en móvil */
+    * {
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+    }
+    
+    /* Optimizar scrolling en lista de récords */
+    .highscores-list {
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
+    
+    /* Asegurar que elementos no se desborden */
+    .game-container, .game-board-container, .side-panel {
+        overflow: hidden;
+    }
+}
+
+/* Pista visual para indicar que es táctil */
+@media (hover: none) and (pointer: coarse) {
+    .touch-hint::before {
+        content: "👆 ";
+        font-size: 0.8em;
+    }
 } 
