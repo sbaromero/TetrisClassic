@@ -278,6 +278,11 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     text-transform: uppercase;
+    /* Optimización táctil */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 48px; /* Tamaño mínimo recomendado para touch */
+    min-width: 48px;
 }
 
 #startBtn {
@@ -324,6 +329,14 @@ body {
 
 .game-controls button:active {
     transform: translateY(1px);
+}
+
+/* Feedback táctil para botones en móvil */
+@media (hover: none) and (pointer: coarse) {
+    .game-controls button:active {
+        background: rgba(78, 205, 196, 0.3) !important;
+        transform: scale(0.95);
+    }
 }
 
 /* Efectos especiales para el botón "Jugar de Nuevo" */
@@ -852,24 +865,150 @@ body {
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .game-board-container {
+    body {
+        padding: 10px;
+        min-height: 100vh;
+        display: flex;
         flex-direction: column;
-        align-items: center;
+        justify-content: flex-start;
     }
     
-    .side-panel {
-        flex-direction: row;
+    .game-container {
+        padding: 15px;
+        margin: 0;
         width: 100%;
-        justify-content: space-around;
+        max-width: 100%;
+        box-sizing: border-box;
     }
     
     .game-header h1 {
-        font-size: 2em;
+        font-size: 1.8em;
+        margin-bottom: 15px;
     }
     
     .score-panel {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+        margin-bottom: 15px;
+    }
+    
+    .score-item {
+        font-size: 1em;
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        min-width: 80px;
+    }
+    
+    .game-board-container {
         flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .main-game-area {
+        order: 1;
+        margin-bottom: 10px;
+    }
+    
+    #gameCanvas {
+        width: 280px;
+        height: 560px;
+        border-width: 2px;
+        /* Optimizado para touch */
+        touch-action: none;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+    }
+    
+    .side-panel {
+        order: 2;
+        flex-direction: row;
+        width: 100%;
+        justify-content: space-around;
+        flex-wrap: wrap;
         gap: 10px;
+    }
+    
+    .next-piece-container {
+        order: 1;
+        max-width: 140px;
+    }
+    
+    .controls {
+        order: 2;
+        max-width: 140px;
+    }
+    
+    .highscores-container {
+        order: 3;
+        max-width: 280px;
+        width: 100%;
+    }
+    
+    .users-counter {
+        margin-top: 10px;
+    }
+    
+    .game-controls {
+        order: 3;
+        margin-top: 15px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .game-controls button {
+        font-size: 1em;
+        padding: 12px 20px;
+        min-width: 80px;
+        /* Optimizado para touch */
+        touch-action: manipulation;
+    }
+    
+    .record-modal-content {
+        padding: 20px;
+        margin: 10px;
+        max-width: 90%;
+    }
+    
+    /* Mejoras para controles de información */
+    .control-info p {
+        font-size: 0.85em;
+        margin: 3px 0;
+    }
+    
+    .highscores-list {
+        max-height: 200px;
+    }
+    
+    .highscore-item {
+        padding: 10px 12px;
+        margin: 6px 0;
+        min-height: 35px;
+    }
+    
+    .highscore-rank {
+        font-size: 1em;
+        min-width: 25px;
+    }
+    
+    .highscore-name {
+        font-size: 0.9em;
+    }
+    
+    .highscore-score {
+        font-size: 1em;
+        min-width: 70px;
+    }
+}
+
+/* Estilos específicos para móviles muy pequeños */
+@media (max-width: 480px) {
+    .game-header h1 {
+        font-size: 1.6em;
     }
     
     #gameCanvas {
@@ -877,12 +1016,99 @@ body {
         height: 500px;
     }
     
-    .highscores-container {
-        max-width: 280px;
+    .side-panel {
+        flex-direction: column;
+        align-items: center;
     }
     
-    .record-modal-content {
-        padding: 20px;
-        margin: 10px;
+    .next-piece-container,
+    .controls,
+    .highscores-container {
+        max-width: 100%;
+        width: 100%;
+        margin-bottom: 15px;
+    }
+    
+    .score-panel {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .score-item {
+        font-size: 0.9em;
+        padding: 6px 10px;
+    }
+}
+
+/* Control de visibilidad de instrucciones según dispositivo */
+.desktop-controls {
+    display: block;
+}
+
+.touch-controls {
+    display: none;
+}
+
+/* Indicador visual para controles táctiles */
+@media (hover: none) and (pointer: coarse) {
+    /* Ocultar controles de teclado y mostrar táctiles */
+    .desktop-controls {
+        display: none;
+    }
+    
+    .touch-controls {
+        display: block;
+    }
+    
+    #gameCanvas {
+        border-color: #4ecdc4;
+        box-shadow: 0 0 15px rgba(78, 205, 196, 0.3);
+    }
+    
+    #gameCanvas::after {
+        content: "👆 Toca para jugar";
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.9em;
+        pointer-events: none;
+    }
+    
+    .main-game-area {
+        position: relative;
+    }
+}
+
+/* Feedback visual para gestos táctiles */
+.touch-feedback {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    background: rgba(78, 205, 196, 0.9);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 1.2em;
+    font-weight: bold;
+    transform: translate(-50%, -50%);
+    animation: touchFeedbackAnimation 0.8s ease-out forwards;
+    box-shadow: 0 4px 12px rgba(78, 205, 196, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+@keyframes touchFeedbackAnimation {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    20% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.2);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.6) translateY(-30px);
     }
 } 

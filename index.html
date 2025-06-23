@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Tetris Classic</title>
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -49,13 +49,21 @@
             
             <div class="side-panel">
                 <div class="controls">
-                    <h3>Controles:</h3>
-                    <div class="control-info">
+                    <h3>🎮 Controles</h3>
+                    <!-- Controles de teclado (desktop) -->
+                    <div class="control-info desktop-controls">
                         <p>← → : Mover</p>
                         <p>↓ : Bajar rápido</p>
                         <p>↑ : Rotar</p>
                         <p>Espacio: Soltar</p>
                         <p>P: Pausa</p>
+                    </div>
+                    <!-- Controles táctiles (móvil) -->
+                    <div class="control-info touch-controls">
+                        <p>👈👉 Deslizar para mover</p>
+                        <p>👇 Deslizar abajo</p>
+                        <p>👆 Tocar para rotar</p>
+                        <p>⏳ Mantener para soltar</p>
                     </div>
                 </div>
                 

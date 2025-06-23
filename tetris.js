@@ -1383,6 +1383,147 @@ document.getElementById('soundBtn').addEventListener('click', () => {
     toggleSound();
 });
 
+// ===== CONTROLES TÁCTILES PARA MÓVIL =====
+
+let touchStartX = 0;
+let touchStartY = 0;
+let touchStartTime = 0;
+let touchMoved = false;
+
+const SWIPE_THRESHOLD = 50; // Distancia mínima para considerar un swipe
+const TAP_THRESHOLD = 10; // Distancia máxima para considerar un tap
+const LONG_TAP_DURATION = 500; // Duración para tap largo (ms)
+
+// Inicializar controles táctiles
+function initTouchControls() {
+    const gameCanvas = document.getElementById('gameCanvas');
+    
+    // Prevenir comportamientos por defecto del navegador
+    gameCanvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+    gameCanvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+    gameCanvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+    
+    // Prevenir zoom y scroll en el área de juego
+    document.addEventListener('touchmove', (e) => {
+        if (e.target === gameCanvas) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+    
+    // Prevenir el menú contextual en móviles
+    gameCanvas.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+    });
+}
+
+function handleTouchStart(e) {
+    if (!gameState.gameStarted || gameState.gameOver || gameState.paused) return;
+    
+    e.preventDefault();
+    const touch = e.touches[0];
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+    touchStartTime = Date.now();
+    touchMoved = false;
+}
+
+function handleTouchMove(e) {
+    if (!gameState.gameStarted || gameState.gameOver || gameState.paused) return;
+    
+    e.preventDefault();
+    const touch = e.touches[0];
+    const deltaX = Math.abs(touch.clientX - touchStartX);
+    const deltaY = Math.abs(touch.clientY - touchStartY);
+    
+    // Marcar como movido si supera el umbral
+    if (deltaX > TAP_THRESHOLD || deltaY > TAP_THRESHOLD) {
+        touchMoved = true;
+    }
+}
+
+function handleTouchEnd(e) {
+    if (!gameState.gameStarted || gameState.gameOver || gameState.paused) return;
+    
+    e.preventDefault();
+    const touch = e.changedTouches[0];
+    const deltaX = touch.clientX - touchStartX;
+    const deltaY = touch.clientY - touchStartY;
+    const deltaTime = Date.now() - touchStartTime;
+    
+    const absDeltaX = Math.abs(deltaX);
+    const absDeltaY = Math.abs(deltaY);
+    
+    if (!touchMoved) {
+        // Es un TAP
+        if (deltaTime > LONG_TAP_DURATION) {
+            // TAP LARGO - Soltar pieza
+            dropPiece();
+            vibrateFeedback(100); // Vibración fuerte para drop
+            showTouchFeedback('DROP', touch.clientX, touch.clientY);
+            console.log('Touch: Drop piece (long tap)');
+        } else {
+            // TAP CORTO - Rotar pieza
+            rotateCurrentPiece();
+            vibrateFeedback(50); // Vibración suave para rotación
+            showTouchFeedback('ROTATE', touch.clientX, touch.clientY);
+            console.log('Touch: Rotate piece (tap)');
+        }
+    } else {
+        // Es un SWIPE
+        if (absDeltaX > absDeltaY && absDeltaX > SWIPE_THRESHOLD) {
+            // SWIPE HORIZONTAL
+            if (deltaX > 0) {
+                // Swipe derecha
+                movePiece(1, 0);
+                vibrateFeedback(30);
+                showTouchFeedback('→', touch.clientX, touch.clientY);
+                console.log('Touch: Move right (swipe)');
+            } else {
+                // Swipe izquierda
+                movePiece(-1, 0);
+                vibrateFeedback(30);
+                showTouchFeedback('←', touch.clientX, touch.clientY);
+                console.log('Touch: Move left (swipe)');
+            }
+        } else if (absDeltaY > absDeltaX && absDeltaY > SWIPE_THRESHOLD) {
+            // SWIPE VERTICAL
+            if (deltaY > 0) {
+                // Swipe abajo - bajar rápido
+                movePiece(0, 1);
+                vibrateFeedback(25);
+                showTouchFeedback('↓', touch.clientX, touch.clientY);
+                console.log('Touch: Move down (swipe)');
+            }
+            // Ignoramos swipe hacia arriba
+        }
+    }
+}
+
+// Vibración táctil (si está disponible)
+function vibrateFeedback(duration) {
+    if ('vibrate' in navigator) {
+        navigator.vibrate(duration);
+    }
+}
+
+// Feedback visual para gestos táctiles
+function showTouchFeedback(action, x, y) {
+    const feedback = document.createElement('div');
+    feedback.className = 'touch-feedback';
+    feedback.textContent = action;
+    feedback.style.left = x + 'px';
+    feedback.style.top = y + 'px';
+    
+    document.body.appendChild(feedback);
+    
+    // Remover después de la animación
+    setTimeout(() => {
+        if (feedback.parentNode) {
+            feedback.parentNode.removeChild(feedback);
+        }
+    }, 800);
+}
+
 // Inicializar cuando se carga la página
 window.addEventListener('load', async () => {
     initGame();
@@ -1390,4 +1531,5 @@ window.addEventListener('load', async () => {
     drawNextPiece();
     await loadHighScores();
     await initUniqueUser(); // Inicializar contador de usuarios únicos
+    initTouchControls(); // Inicializar controles táctiles
 }); 
