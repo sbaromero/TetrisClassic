@@ -1397,6 +1397,15 @@ document.getElementById('soundBtn').addEventListener('click', () => {
     toggleSound();
 });
 
+// Botón de pantalla completa
+document.getElementById('fullscreenBtn').addEventListener('click', () => {
+    toggleFullscreen();
+    playButtonSound();
+    
+    // Guardar preferencia del usuario
+    localStorage.setItem('tetrisFullscreenPreference', (!isFullscreen()).toString());
+});
+
 // ===== CONTROLES TÁCTILES PARA MÓVIL =====
 
 let touchStartX = 0;
@@ -1510,6 +1519,11 @@ function handleTouchEnd(e) {
     if (!gameState.gameStarted) {
         console.log('🚀 Iniciando juego con touch');
         startGame();
+        
+        // Auto-entrar en pantalla completa al iniciar con touch
+        if (!isFullscreen()) {
+            setTimeout(() => enterFullscreen(), 300);
+        }
         return;
     }
     
@@ -1584,6 +1598,93 @@ function showTouchFeedback(action, x, y) {
     }, 800);
 }
 
+// ===== FUNCIONES DE PANTALLA COMPLETA =====
+
+// Entrar en pantalla completa
+function enterFullscreen() {
+    const elem = document.documentElement;
+    
+    if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) { // Safari
+        elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) { // IE/Edge
+        elem.msRequestFullscreen();
+    } else if (elem.mozRequestFullScreen) { // Firefox
+        elem.mozRequestFullScreen();
+    }
+    
+    console.log('📺 Solicitando pantalla completa...');
+}
+
+// Salir de pantalla completa
+function exitFullscreen() {
+    if (document.exitFullscreen) {
+        document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) { // Safari
+        document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) { // IE/Edge
+        document.msExitFullscreen();
+    } else if (document.mozCancelFullScreen) { // Firefox
+        document.mozCancelFullScreen();
+    }
+    
+    console.log('📱 Saliendo de pantalla completa...');
+}
+
+// Verificar si está en pantalla completa
+function isFullscreen() {
+    return !!(document.fullscreenElement || 
+              document.webkitFullscreenElement || 
+              document.mozFullScreenElement || 
+              document.msFullscreenElement);
+}
+
+// Toggle pantalla completa
+function toggleFullscreen() {
+    if (isFullscreen()) {
+        exitFullscreen();
+    } else {
+        enterFullscreen();
+    }
+}
+
+// Auto-entrar en pantalla completa al iniciar juego
+function autoEnterFullscreen() {
+    // Solo en dispositivos móviles o si el usuario lo prefiere
+    if (window.matchMedia('(hover: none) and (pointer: coarse)').matches || 
+        localStorage.getItem('tetrisFullscreenPreference') === 'true') {
+        
+        setTimeout(() => {
+            if (!isFullscreen()) {
+                enterFullscreen();
+            }
+        }, 500); // Pequeño delay para evitar problemas de permisos
+    }
+}
+
+// Manejar cambios de orientación en pantalla completa
+function handleOrientationChange() {
+    if (isFullscreen()) {
+        // Pequeño delay para que la orientación se estabilice
+        setTimeout(() => {
+            console.log('🔄 Orientación cambiada en pantalla completa');
+            // Aquí se podría ajustar el layout si es necesario
+        }, 300);
+    }
+}
+
+// Manejar cambios de pantalla completa
+function handleFullscreenChange() {
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    if (fullscreenBtn) {
+        fullscreenBtn.textContent = isFullscreen() ? '🔳' : '⛶';
+        fullscreenBtn.title = isFullscreen() ? 'Salir de pantalla completa' : 'Pantalla completa';
+    }
+    
+    console.log('📺 Estado pantalla completa:', isFullscreen());
+}
+
 // Inicializar cuando se carga la página
 window.addEventListener('load', async () => {
     initGame();
@@ -1592,6 +1693,19 @@ window.addEventListener('load', async () => {
     await loadHighScores();
     await initUniqueUser(); // Inicializar contador de usuarios únicos
     initTouchControls(); // Inicializar controles táctiles
+    
+    // Configurar eventos de pantalla completa
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+    
+    // Configurar eventos de orientación
+    window.addEventListener('orientationchange', handleOrientationChange);
+    window.addEventListener('resize', handleOrientationChange);
+    
+    // Auto-entrar en pantalla completa en móviles
+    autoEnterFullscreen();
     
     // Debug: Detectar cualquier toque en la pantalla
     document.addEventListener('touchstart', (e) => {

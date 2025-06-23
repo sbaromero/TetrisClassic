@@ -350,6 +350,13 @@ body {
     padding: 10px 20px;
 }
 
+#fullscreenBtn {
+    background: linear-gradient(45deg, #34495e, #2c3e50);
+    color: white;
+    font-size: 1.2em;
+    padding: 10px 20px;
+}
+
 .game-controls button:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
@@ -1171,4 +1178,52 @@ body {
         opacity: 0;
         transform: translate(-50%, -50%) scale(0.6) translateY(-30px);
     }
+}
+
+/* Estilos para pantalla completa */
+:fullscreen {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+}
+
+:-webkit-full-screen {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+}
+
+:-moz-full-screen {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+}
+
+:-ms-fullscreen {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+}
+
+/* Ajustes específicos en pantalla completa */
+:fullscreen .game-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 10px;
+    max-width: none;
+}
+
+:-webkit-full-screen .game-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 10px;
+    max-width: none;
+}
+
+:fullscreen #gameCanvas {
+    max-height: 70vh;
+    width: auto;
+    height: auto;
+}
+
+:-webkit-full-screen #gameCanvas {
+    max-height: 70vh;
+    width: auto;
+    height: auto;
 } 
